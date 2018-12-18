@@ -13,8 +13,8 @@ public class KMeansCluster
     
     private static double PUNCTE[][];
     
-    private static ArrayList<Date> setDate = new ArrayList<Date>();
-    private static ArrayList<Centroid> centroizi = new ArrayList<Centroid>();
+    private static ArrayList<Date> setDate = new ArrayList<>();
+    private static ArrayList<Centroid> centroizi = new ArrayList<>();
     
     private static void initializareDate(String fisier)
     {
@@ -39,8 +39,11 @@ public class KMeansCluster
         String[] split0 = date.split("\r\n\r\n");
         String[] split = split0[0].split("\r\n");
         for (int i = 0; i < split.length; i++) {
-			double x = Double.parseDouble(split[i].substring(0, 3));
-			double y = Double.parseDouble(split[i].substring(4, 7));
+        	String[] split2 = split[i].split("[ \t]");
+			String s1 = split2[0];
+			double x = Double.parseDouble(s1);
+			String s2 = split2[1];
+			double y = Double.parseDouble(s2);
 			centroizi.add(new Centroid(x, y));
 		}
         NR_CLUSTERE=centroizi.size();
@@ -54,8 +57,11 @@ public class KMeansCluster
         split = split0[1].split("\r\n");
         PUNCTE= new double[split.length][2];
             for (int i = 0; i < split.length; i++) {
-            	PUNCTE[i][0]=Double.parseDouble(split[i].substring(0, 3));
-            	PUNCTE[i][1]=Double.parseDouble(split[i].substring(4, 7));
+            	String[] split2 = split[i].split("[ \t]");
+    			String s1 = split2[0];
+            	PUNCTE[i][0]=Double.parseDouble(s1);
+    			String s2 = split2[1];
+            	PUNCTE[i][1]=Double.parseDouble(s2);
     		}
         TOTAL_PUNCTE=PUNCTE.length;
     }
@@ -159,6 +165,7 @@ public class KMeansCluster
     }
 
     // Distanta Euclidiana
+    @SuppressWarnings("unused")
     private static double distEuclid(Date v1, Centroid v2)
     {
         return Math.sqrt(Math.pow((v2.Y() - v1.Y()), 2) + Math.pow((v2.X() - v1.X()), 2));
@@ -166,7 +173,8 @@ public class KMeansCluster
     
     
     // Distanta Manhattan
-    private static double distMan(Date v1, Centroid v2)
+    @SuppressWarnings("unused")
+	private static double distMan(Date v1, Centroid v2)
     {
         return Math.abs((v2.Y() - v1.Y())) + Math.abs((v2.X() - v1.X()));
     }
