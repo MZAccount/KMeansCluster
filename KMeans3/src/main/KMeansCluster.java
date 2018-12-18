@@ -1,4 +1,4 @@
-
+package main;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -16,16 +16,13 @@ public class KMeansCluster
     private static ArrayList<Date> setDate = new ArrayList<Date>();
     private static ArrayList<Centroid> centroizi = new ArrayList<Centroid>();
     
-    private static void initializareDate()
+    private static void initializareDate(String fisier)
     {
    
     	
         System.out.println("Centroizi initializati:");
         String date="";
-//        "1.0 1.0\r\n5.0 7.0\r\n\r\n1.0 1.0\r\n1.5, 2.0\r\n3.0 4.0\r\n5.0 7.0\r\n3.5 5.0\r\n4.5 5.0\r\n3.5 4.5";
-
-        
-     	File file = new File("date.txt");
+     	File file = new File(fisier);
     	FileInputStream fileInputStream;
 		try {
 			fileInputStream = new FileInputStream(file);
@@ -258,7 +255,7 @@ public class KMeansCluster
     
     public static void main(String[] args)
     {
-        initializareDate();
+        initializareDate(args[0]);
         kMeansCluster();
         
         // Printeaza numarul de clustere
