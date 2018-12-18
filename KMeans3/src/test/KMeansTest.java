@@ -23,7 +23,7 @@ public class KMeansTest {
 	public void test1() {
 		String testName = name.getMethodName();
 
-		KMeansCluster.main(("test\\" + testName + "\\date.txt").split("#"));
+		KMeansCluster.main(("test/" + testName + "/date.txt").split("#"));
 	}
 
 	/**
@@ -34,7 +34,7 @@ public class KMeansTest {
 	public void test2() {
 		String testName = name.getMethodName();
 
-		KMeansCluster.main(("test\\" + testName + "\\date.txt").split("#"));
+		KMeansCluster.main(("test/" + testName + "/date.txt").split("#"));
 	}
 
 	/**
@@ -45,7 +45,7 @@ public class KMeansTest {
 	public void test3() {
 		String testName = name.getMethodName();
 
-		KMeansCluster.main(("test\\" + testName + "\\date.txt").split("#"));
+		KMeansCluster.main(("test/" + testName + "/date.txt").split("#"));
 	}
 
 	/**
@@ -56,7 +56,7 @@ public class KMeansTest {
 	public void test4() {
 		String testName = name.getMethodName();
 
-		KMeansCluster.main(("test\\" + testName + "\\date.txt").split("#"));
+		KMeansCluster.main(("test/" + testName + "/date.txt").split("#"));
 	}
 
 	/**
@@ -68,7 +68,7 @@ public class KMeansTest {
 	public void test5() {
 		String testName = name.getMethodName();
 
-		KMeansCluster.main(("test\\" + testName + "\\date.txt").split("#"));
+		KMeansCluster.main(("test/" + testName + "/date.txt").split("#"));
 	}
 
 	/**
@@ -80,7 +80,7 @@ public class KMeansTest {
 	public void test6() {
 		String testName = name.getMethodName();
 
-		KMeansCluster.main(("test\\" + testName + "\\date.txt").split("#"));
+		KMeansCluster.main(("test/" + testName + "/date.txt").split("#"));
 	}
 
 	@SuppressWarnings("unused")
