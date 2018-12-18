@@ -1,152 +1,186 @@
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.util.ArrayList;
+
+import org.apache.commons.io.IOUtils;
 
 public class KMeansCluster
 {
-    private static final int NUM_CLUSTERS = 2;    // Total clusters.
-    private static final int TOTAL_DATA = 7;      // Total data points.
+    private static int NR_CLUSTERE;    		// Total clustere.
+    private static int TOTAL_PUNCTE;    	// Total puncte.
     
-    private static final double SAMPLES[][] = new double[][] {{1.0, 1.0}, 
-                                                                {1.5, 2.0}, 
-                                                                {3.0, 4.0}, 
-                                                                {5.0, 7.0}, 
-                                                                {3.5, 5.0}, 
-                                                                {4.5, 5.0}, 
-                                                                {3.5, 4.5}};
+    private static double PUNCTE[][];
     
-    private static ArrayList<Data> dataSet = new ArrayList<Data>();
-    private static ArrayList<Centroid> centroids = new ArrayList<Centroid>();
+    private static ArrayList<Date> setDate = new ArrayList<Date>();
+    private static ArrayList<Centroid> centroizi = new ArrayList<Centroid>();
     
-    private static void initialize()
+    private static void initializareDate()
     {
-        System.out.println("Centroids initialized at:");
-        centroids.add(new Centroid(1.0, 1.0)); // lowest set.
-        centroids.add(new Centroid(5.0, 7.0)); // highest set.
-        System.out.println("     (" + centroids.get(0).X() + ", " + centroids.get(0).Y() + ")");
-        System.out.println("     (" + centroids.get(1).X() + ", " + centroids.get(1).Y() + ")");
+   
+    	
+        System.out.println("Centroizi initializati:");
+        String date="";
+//        "1.0 1.0\r\n5.0 7.0\r\n\r\n1.0 1.0\r\n1.5, 2.0\r\n3.0 4.0\r\n5.0 7.0\r\n3.5 5.0\r\n4.5 5.0\r\n3.5 4.5";
+
+        
+     	File file = new File("date.txt");
+    	FileInputStream fileInputStream;
+		try {
+			fileInputStream = new FileInputStream(file);
+		
+    	
+    	String theString = IOUtils.toString(fileInputStream, "UTF-8"); 
+		
+        date=theString;
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+        String[] split0 = date.split("\r\n\r\n");
+        String[] split = split0[0].split("\r\n");
+        for (int i = 0; i < split.length; i++) {
+			double x = Double.parseDouble(split[i].substring(0, 3));
+			double y = Double.parseDouble(split[i].substring(4, 7));
+			centroizi.add(new Centroid(x, y));
+		}
+        NR_CLUSTERE=centroizi.size();
+
+        for(int i = 0; i < NR_CLUSTERE; i++)
+        {
+            System.out.println("     (" + centroizi.get(i).X() + ", " + centroizi.get(i).Y()+")");
+        }
         System.out.print("\n");
-        return;
+            
+        split = split0[1].split("\r\n");
+        PUNCTE= new double[split.length][2];
+            for (int i = 0; i < split.length; i++) {
+            	PUNCTE[i][0]=Double.parseDouble(split[i].substring(0, 3));
+            	PUNCTE[i][1]=Double.parseDouble(split[i].substring(4, 7));
+    		}
+        TOTAL_PUNCTE=PUNCTE.length;
     }
     
-    private static void kMeanCluster()
+    private static void kMeansCluster()
     {
-        final double bigNumber = Integer.MAX_VALUE;   // some big number that's sure to be larger than our data range.
-        double minimum = bigNumber;                   // The minimum value to beat. 
-        double distance = 0.0;                        // The current minimum value.
         int sampleNumber = 0;
         int cluster = 0;
-        boolean isStillMoving = true;
-        Data newData = null;
+        boolean continuaOptimizarea = true;
+        Date date = null;
         
         // Add in new data, one at a time, recalculating centroids with each new one. 
-        while(dataSet.size() < TOTAL_DATA)
+        while(setDate.size() < TOTAL_PUNCTE)
         {
-            newData = new Data(SAMPLES[sampleNumber][0], SAMPLES[sampleNumber][1]);
-            dataSet.add(newData);
-            minimum = bigNumber;
-            for(int i = 0; i < NUM_CLUSTERS; i++)
+            date = new Date(PUNCTE[sampleNumber][0], PUNCTE[sampleNumber][1]);
+            setDate.add(date);
+            double minim = Double.MAX_VALUE;
+            for(int i = 0; i < NR_CLUSTERE; i++)
             {
-                distance = dist(newData, centroids.get(i));
-                if(distance < minimum){
-                    minimum = distance;
+            	double distance = dist(date, centroizi.get(i));
+                if(distance < minim){
+                    minim = distance;
                     cluster = i;
                 }
             }
-            newData.cluster(cluster);
+            date.cluster(cluster);
             
-            // calculate new centroids.
-            for(int i = 0; i < NUM_CLUSTERS; i++)
+            // calculeaza centroizi noi
+            for(int i = 0; i < NR_CLUSTERE; i++)
             {
-                int totalX = 0;
-                int totalY = 0;
+                double totalX = 0;
+                double totalY = 0;
                 int totalInCluster = 0;
-                for(int j = 0; j < dataSet.size(); j++)
+                for(int j = 0; j < setDate.size(); j++)
                 {
-                    if(dataSet.get(j).cluster() == i){
-                        totalX += dataSet.get(j).X();
-                        totalY += dataSet.get(j).Y();
+                    if(setDate.get(j).cluster() == i){
+                        totalX += setDate.get(j).X();
+                        totalY += setDate.get(j).Y();
                         totalInCluster++;
                     }
                 }
                 if(totalInCluster > 0){
-                    centroids.get(i).X(totalX / totalInCluster);
-                    centroids.get(i).Y(totalY / totalInCluster);
+                    centroizi.get(i).X(totalX / totalInCluster);
+                    centroizi.get(i).Y(totalY / totalInCluster);
                 }
             }
             sampleNumber++;
         }
         
-        // Now, keep shifting centroids until equilibrium occurs.
-        while(isStillMoving)
+        // Continua pasii de optimizarea a pozitiei centroizilor
+        while(continuaOptimizarea)
         {
-            // calculate new centroids.
-            for(int i = 0; i < NUM_CLUSTERS; i++)
+            // calculeaza centroizi noi
+            for(int i = 0; i < NR_CLUSTERE; i++)
             {
-                int totalX = 0;
-                int totalY = 0;
+                double totalX = 0;
+                double totalY = 0;
                 int totalInCluster = 0;
-                for(int j = 0; j < dataSet.size(); j++)
+                for(int j = 0; j < setDate.size(); j++)
                 {
-                    if(dataSet.get(j).cluster() == i){
-                        totalX += dataSet.get(j).X();
-                        totalY += dataSet.get(j).Y();
+                    if(setDate.get(j).cluster() == i){
+                        totalX += setDate.get(j).X();
+                        totalY += setDate.get(j).Y();
                         totalInCluster++;
                     }
                 }
                 if(totalInCluster > 0){
-                    centroids.get(i).X(totalX / totalInCluster);
-                    centroids.get(i).Y(totalY / totalInCluster);
+                    centroizi.get(i).X(totalX / totalInCluster);
+                    centroizi.get(i).Y(totalY / totalInCluster);
                 }
             }
             
             // Assign all data to the new centroids
-            isStillMoving = false;
+            continuaOptimizarea = false;
             
-            for(int i = 0; i < dataSet.size(); i++)
+            for(int i = 0; i < setDate.size(); i++)
             {
-                Data tempData = dataSet.get(i);
-                minimum = bigNumber;
-                for(int j = 0; j < NUM_CLUSTERS; j++)
+                Date tempData = setDate.get(i);
+                double minim = Double.MAX_VALUE;
+                for(int j = 0; j < NR_CLUSTERE; j++)
                 {
-                    distance = dist(tempData, centroids.get(j));
-                    if(distance < minimum){
-                        minimum = distance;
+                	double distance = dist(tempData, centroizi.get(j));
+                    if(distance < minim){
+                        minim = distance;
                         cluster = j;
                     }
                 }
-                tempData.cluster(cluster);
                 if(tempData.cluster() != cluster){
                     tempData.cluster(cluster);
-                    isStillMoving = true;
+                    continuaOptimizarea = true;
                 }
             }
         }
         return;
     }
-    
-    /**
-     * // Calculate Euclidean distance.
-     * @param d - Data object.
-     * @param c - Centroid object.
-     * @return - double value.
-     */
-    private static double dist(Data d, Centroid c)
+
+    // Distanta Euclidiana
+    private static double dist(Date v1, Centroid v2)
     {
-        return Math.sqrt(Math.pow((c.Y() - d.Y()), 2) + Math.pow((c.X() - d.X()), 2));
+        return distEuclid(v1,v2);
+    }
+
+    // Distanta Euclidiana
+    private static double distEuclid(Date v1, Centroid v2)
+    {
+        return Math.sqrt(Math.pow((v2.Y() - v1.Y()), 2) + Math.pow((v2.X() - v1.X()), 2));
     }
     
-    private static class Data
+    
+    // Distanta Manhattan
+    private static double distMan(Date v1, Centroid v2)
+    {
+        return Math.abs((v2.Y() - v1.Y())) + Math.abs((v2.X() - v1.X()));
+    }
+    
+    private static class Date
     {
         private double mX = 0;
         private double mY = 0;
         private int mCluster = 0;
         
-        public Data()
-        {
-            return;
-        }
-        
-        public Data(double x, double y)
+        public Date(double x, double y)
         {
             this.X(x);
             this.Y(y);
@@ -192,21 +226,16 @@ public class KMeansCluster
         private double mX = 0.0;
         private double mY = 0.0;
         
-        public Centroid()
+        public Centroid(double X, double Y)
         {
+            this.mX = X;
+            this.mY = Y;
             return;
         }
         
-        public Centroid(double newX, double newY)
+        public void X(double X)
         {
-            this.mX = newX;
-            this.mY = newY;
-            return;
-        }
-        
-        public void X(double newX)
-        {
-            this.mX = newX;
+            this.mX = X;
             return;
         }
         
@@ -215,9 +244,9 @@ public class KMeansCluster
             return this.mX;
         }
         
-        public void Y(double newY)
+        public void Y(double Y)
         {
-            this.mY = newY;
+            this.mY = Y;
             return;
         }
         
@@ -229,27 +258,27 @@ public class KMeansCluster
     
     public static void main(String[] args)
     {
-        initialize();
-        kMeanCluster();
+        initializareDate();
+        kMeansCluster();
         
-        // Print out clustering results.
-        for(int i = 0; i < NUM_CLUSTERS; i++)
+        // Printeaza numarul de clustere
+        for(int i = 0; i < NR_CLUSTERE; i++)
         {
-            System.out.println("Cluster " + i + " includes:");
-            for(int j = 0; j < TOTAL_DATA; j++)
+            System.out.println("Cluster " + i + " final:");
+            for(int j = 0; j < TOTAL_PUNCTE; j++)
             {
-                if(dataSet.get(j).cluster() == i){
-                    System.out.println("     (" + dataSet.get(j).X() + ", " + dataSet.get(j).Y() + ")");
+                if(setDate.get(j).cluster() == i){
+                    System.out.println("     (" + setDate.get(j).X() + ", " + setDate.get(j).Y() + ")");
                 }
             } // j
             System.out.println();
         } // i
         
-        // Print out centroid results.
-        System.out.println("Centroids finalized at:");
-        for(int i = 0; i < NUM_CLUSTERS; i++)
+        // Printeaza centroizii finali
+        System.out.println("Centroizi finali:");
+        for(int i = 0; i < NR_CLUSTERE; i++)
         {
-            System.out.println("     (" + centroids.get(i).X() + ", " + centroids.get(i).Y());
+            System.out.println("     (" + centroizi.get(i).X() + ", " + centroizi.get(i).Y()+")");
         }
         System.out.print("\n");
         return;
