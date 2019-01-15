@@ -36,7 +36,8 @@ public class KMeansCluster
         parsareDate(date);
     }
 
-	private static void parsareDate(String date) {
+	private static void parsareDate(String date) 
+	{
 		String[] split0 = date.split("\r\n\r\n");
         String[] split = split0[0].split("\r\n");
         for (int i = 0; i < split.length; i++) {
@@ -69,24 +70,20 @@ public class KMeansCluster
     
     private static void clusterKMeans()
     {
-        int sampleNumber = 0;
-        StareGrupare continuaOptimizarea = StareGrupare.NEOPTIMIZAT;
-        Punct punct = null;
-        
-        // Adauga date noi si recalculeaza centroizii
-        while(setDate.size() < TOTAL_PUNCTE) {
+		// Adauga date noi si recalculeaza centroizii
+		for (int indexPunct = 0; setDate.size() < TOTAL_PUNCTE; indexPunct++) {
 
-            punct = new Punct(PuncteNegrupate[sampleNumber][0], PuncteNegrupate[sampleNumber][1]);
-            setDate.add(punct);
+			Punct punct = new Punct(PuncteNegrupate[indexPunct][0], PuncteNegrupate[indexPunct][1]);
+			setDate.add(punct);
 
-            int cluster = centroidMinim(punct);
-            punct.cluster(cluster);
-            
-            // calculeaza centroizi noi
+			int cluster = centroidMinim(punct);
+			punct.cluster(cluster);
+
+			// calculeaza centroizi noi
             recalculeazaPozitiaCentroizilor();
-            sampleNumber++;
         }
         
+        StareGrupare continuaOptimizarea = StareGrupare.NEOPTIMIZAT;
         // Continua pasii de optimizarea a pozitiei centroizilor
         while(continuaOptimizarea==StareGrupare.NEOPTIMIZAT)
         {
@@ -99,7 +96,8 @@ public class KMeansCluster
         return;
     }
 
-	private static int centroidMinim(Punct punct) {
+	private static int centroidMinim(Punct punct) 
+	{
 		int cluster = 0;
 		double minim = Double.MAX_VALUE;
 		for(int i = 0; i < NR_CLUSTERE; i++)
@@ -118,7 +116,8 @@ public class KMeansCluster
 	/**
 	 * Atribuie pentru fiecare punct cel mai apropiat cluster
 	 */
-	private static StareGrupare grupeazaPunctele() {
+	private static StareGrupare grupeazaPunctele() 
+	{
 		// Presupunem initial ca este optimizat
 		StareGrupare continuaOptimizarea = StareGrupare.OPTIMIZAT;
         
@@ -134,26 +133,24 @@ public class KMeansCluster
 	}
 
 
-	private static void recalculeazaPozitiaCentroizilor() {
+	private static void recalculeazaPozitiaCentroizilor() 
+	{
 		for(int i = 0; i < NR_CLUSTERE; i++)
 		{
 		    double totalX = 0;
 		    double totalY = 0;
-		    double totalZ = 0;
 		    int totalInCluster = 0;
 		    for(int j = 0; j < setDate.size(); j++)
 		    {
 		        if(setDate.get(j).cluster() == i){
 		            totalX += setDate.get(j).X();
 		            totalY += setDate.get(j).Y();
-		            totalZ += setDate.get(j).Z();
 		            totalInCluster++;
 		        }
 		    }
 		    if(totalInCluster > 0){
 		        centroizi.get(i).X(totalX / totalInCluster);
 		        centroizi.get(i).Y(totalY / totalInCluster);
-		        centroizi.get(i).Z(totalZ / totalInCluster);
 		    }
 		}
 	}
@@ -179,7 +176,50 @@ public class KMeansCluster
         return Math.abs((v2.Y() - v1.Y())) + Math.abs((v2.X() - v1.X()));
     }
     
-    private static class Punct
+    
+    
+    public static void main(String[] args)
+    {
+        new KMeansCluster().run(args);
+    }
+
+    
+	public void run(String[] args) {
+		initializareDate(args[0]);
+		
+        clusterKMeans();
+        
+        printeazaEcran();
+	}
+
+	private void printeazaEcran() {
+		// Printeaza numarul de clustere
+        for(int i = 0; i < NR_CLUSTERE; i++)
+        {
+            print("Cluster " + i + " final:");
+            for(int j = 0; j < TOTAL_PUNCTE; j++)
+            {
+                if(setDate.get(j).cluster() == i){
+                    print("     (" + setDate.get(j).X() + ", " + setDate.get(j).Y() + ")");
+                }
+            }
+
+        }
+        
+        // Printeaza centroizii finali
+        print("Centroizi finali:");
+        for(int i = 0; i < NR_CLUSTERE; i++)
+        {
+            print("     (" + centroizi.get(i).X() + ", " + centroizi.get(i).Y()+")");
+        }
+        System.out.print("\n");
+	}
+
+	private static void print(String string) {
+		System.out.println(string);
+	}
+    
+	private static class Punct
     {
         private int mIndexCluster = 0;
         
@@ -221,7 +261,8 @@ public class KMeansCluster
             return;
         }
         
-        public double Z()
+        @SuppressWarnings("unused")
+		public double Z()
         {
             return this.s.get(0, 2);
         }
@@ -236,23 +277,25 @@ public class KMeansCluster
         {
             return this.mIndexCluster;
         }
+
+        @Override
+        public String toString() {
+        	return "{"+X()+","+Y()+";"+mIndexCluster+"}";
+        }
     }
     
     private static class Centroid
     {
 
-        DoubleMatrix s=new DoubleMatrix(1,3);
-        
-        public Centroid(double X, double Y)
-        {
-            this.s.put(0,0,X);
-            this.s.put(0,1,Y);
-            return;
-        }
-        
+		DoubleMatrix s = new DoubleMatrix(1, 3);
 
-		public void X(double X)
-        {
+		public Centroid(double X, double Y) {
+			this.s.put(0, 0, X);
+			this.s.put(0, 1, Y);
+			return;
+		}
+
+		public void X(double X) {
             this.s.put(0, 0,X);
             return;
         }
@@ -273,6 +316,7 @@ public class KMeansCluster
             return this.s.get(0,1);
         }
         
+		@SuppressWarnings("unused")
 		public void Z(double Z)
         {
             this.s.put(0, 2,Z);
@@ -284,44 +328,10 @@ public class KMeansCluster
         {
             return this.s.get(0,2);
         }
-    }
-    
-    public static void main(String[] args)
-    {
-        new KMeansCluster().run(args);
-    }
 
-    
-	public void run(String[] args) {
-		initializareDate(args[0]);
-        clusterKMeans();
-        
-        // Printeaza numarul de clustere
-        for(int i = 0; i < NR_CLUSTERE; i++)
-        {
-            print("Cluster " + i + " final:");
-            for(int j = 0; j < TOTAL_PUNCTE; j++)
-            {
-                if(setDate.get(j).cluster() == i){
-                    print("     (" + setDate.get(j).X() + ", " + setDate.get(j).Y() + ")");
-                }
-            }
-
+        @Override
+        public String toString() {
+        	return "{"+X()+","+Y()+"}";
         }
-        
-        // Printeaza centroizii finali
-        print("Centroizi finali:");
-        for(int i = 0; i < NR_CLUSTERE; i++)
-        {
-            print("     (" + centroizi.get(i).X() + ", " + centroizi.get(i).Y()+")");
-        }
-        System.out.print("\n");
-        return;
-	}
-
-	private static void print(String string) {
-		System.out.println(string);
-	}
-    
-    
+    }
 }
